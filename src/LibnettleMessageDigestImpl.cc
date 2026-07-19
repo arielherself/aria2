@@ -36,6 +36,7 @@
 #include "MessageDigestImpl.h"
 
 #include <nettle/nettle-meta.h>
+#include <nettle/version.h>
 
 #include "Adler32MessageDigestImpl.h"
 
@@ -69,7 +70,12 @@ public:
   }
   virtual void digest(unsigned char* md) CXX11_OVERRIDE
   {
+#if NETTLE_VERSION_MAJOR >= 4
+    // nettle 4 dropped the length parameter from nettle_hash_digest_func.
+    hash->digest(ctx_.get(), md);
+#else
     hash->digest(ctx_.get(), getDigestLength(), md);
+#endif
   }
 
 private:
